@@ -163,6 +163,20 @@ export const ThisMonthSale = (props) => {
             .startOf("day")
             .format("YYYY-MM-DDTHH:mm:ssZ");
           to_date = endOfPreviousYear.endOf("day").format("YYYY-MM-DDTHH:mm:ssZ");
+        } else if (filter === "thisMonthDate") {
+          const startOfThisMonth = moment().subtract(1, "month").startOf("month");
+          const endOfThisMonth = moment().subtract(1, "month").endOf("month");
+          from_date = startOfThisMonth
+            .startOf("day")
+            .format("YYYY-MM-DDTHH:mm:ssZ");
+          to_date = endOfThisMonth.endOf("day").format("YYYY-MM-DDTHH:mm:ssZ");
+        } else if (filter === "thisYearDate") {
+          const startOfThisYear = moment().subtract(1, "year").startOf("year");
+          const endOfThisYear = moment().subtract(1, "year").endOf("year");
+          from_date = startOfThisYear
+            .startOf("day")
+            .format("YYYY-MM-DDTHH:mm:ssZ");
+          to_date = endOfThisYear.endOf("day").format("YYYY-MM-DDTHH:mm:ssZ");
         }
     
         await axios

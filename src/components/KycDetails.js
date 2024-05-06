@@ -4,6 +4,7 @@ import { getDateFormate, hideAddress } from "../utils";
 import listData from "./countryData";
 import moment from "moment";
 
+//This component is used for KYC details 
 export const KycDetails = (props) => {
   const countryMap = listData.reduce((acc, item) => {
     acc[item.iso] = item.country;

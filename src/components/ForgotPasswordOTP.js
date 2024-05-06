@@ -19,6 +19,8 @@ const DigitInput = styled.input`
   margin: 0 5px;
   outline: none;
 `;
+
+//This component is used for forget pass OTP
 const ForgotPasswordOTP = (props) => {
   const [secret, setSecret] = useState("");
   const [otpValue, setOTPValue] = useState("");

@@ -205,8 +205,6 @@ function Userlist() {
     });
   };
   
-
-
   const deleteUserKyc = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -322,8 +320,8 @@ function Userlist() {
               <p className="text-white">{parseFloat(formattedNumber(item?.totalAmount)).toLocaleString()}</p>
             </div>
             <div className="transaction-verified">
-              <p className="text-white mb-2"><DownloadIcon width="18" height="18" />Email</p>
-              <p className="text-white"><DownloadIcon width="18" height="18" />KYC</p>
+              <p className="text-white mb-2" style={{display: "flex"}}><DownloadIcon width="18" height="18" />Email</p>
+              <p className="text-white" style={{display: "flex"}}><DownloadIcon width="18" height="18" />KYC</p>
             </div> 
             <div className="transaction-lastlogin">
               <p className="text-white mb-2">{lastLoginDate}</p>
@@ -360,7 +358,7 @@ function Userlist() {
             <div className="flex-table-body no-records justify-content-between">
               <div className="no-records-text">
                 <div className="no-record-label">No Records</div>
-                <p>You haven't any user records</p>
+                <p>You haven't made any user records</p>
               </div>
             </div>
           )}
@@ -375,13 +373,13 @@ function Userlist() {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          <div className="table-info">
+          {/* <div className="table-info">
             {currentPage === 1
               ? `${totalUsersCount > 0 ? 1 : 0}`
               : `${(currentPage - 1) * PageSize + 1}`}{" "}
             - {`${Math.min(currentPage * PageSize, totalUsersCount)}`} of{" "}
             {totalUsersCount}
-          </div>
+          </div> */}
         </div>
       )}
       <KycDetails show={modalShow} viewKYC={viewKYC} transactiontype={transactionType} onHide={() => setModalShow(false)} type='users'/>

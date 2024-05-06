@@ -14,7 +14,6 @@ import SnackBar from "./snackBar";
 import AuthRoute from "./AuthRoute";
 import TransactionComponent from "./pages/Transaction";
 import ResetPasswordComponent from "./components/ResetPasswordComponent";
-import { isAccess } from "./utils";
 import { useJwt } from "react-jwt";
 import { setSAL } from "./store/slices/AuthenticationSlice";
 
@@ -25,7 +24,6 @@ export const App = () => {
   const modalToggle = () => setModalShow(!modalShow);
   const [isResponsive, setIsResponsive] = useState(false);
   const dispatch = useDispatch();
-
   const token = localStorage.getItem("token") || "";
   
   const { decodedToken } = useJwt(token);

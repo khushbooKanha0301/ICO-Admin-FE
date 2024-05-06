@@ -215,19 +215,21 @@ function Dashboard() {
                 {transactions?.slice(0, 3).map((transaction) => (
                     <tr key={transaction?._id}>
                       <td>
-                        {transaction?.status == "paid" && (
-                          <CheckCircleIcon width="16" height="16" />
-                        )}
-                        {(transaction?.status == "canceled" ||
-                          transaction?.status == "expired" ||
-                          transaction?.status == "invalid") && (
-                          <CloseIcon width="16" height="16" />
-                        )}
-                        {(transaction?.status == "new" ||
-                          transaction?.status == "pending") && (
-                          <ExclamationIcon width="16" height="16" />
-                        )}
-                        {formattedNumber(transaction?.token_cryptoAmount)}
+                        <div style={{display: "flex" , alignItems: "center"}}>
+                          {transaction?.status == "paid" && (
+                            <CheckCircleIcon width="16" height="16" />
+                          )}
+                          {(transaction?.status == "canceled" ||
+                            transaction?.status == "expired" ||
+                            transaction?.status == "invalid") && (
+                            <CloseIcon width="16" height="16" />
+                          )}
+                          {(transaction?.status == "new" ||
+                            transaction?.status == "pending") && (
+                            <ExclamationIcon width="16" height="16" />
+                          )}
+                          {formattedNumber(transaction?.token_cryptoAmount)}
+                          </div>
                       </td>
                       <td>
                         <p className="text-white mb-1">
