@@ -742,6 +742,7 @@ body {
                     background: none;
                     border: none;
                     text-transform: uppercase;
+                    padding: 1px 6px;
 
                     &:not(:last-child) {
                         margin-right: 8px;
@@ -751,7 +752,6 @@ body {
                     &.active {
                         background: #484A52;
                         border-radius: 12px;
-                        padding: 0px 6px;
                     }
                 }
             }
