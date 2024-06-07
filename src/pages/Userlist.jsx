@@ -13,7 +13,7 @@ import { database, firebaseMessages } from '../config';
 import { ref, set } from '@firebase/database';
 
 
-function Userlist() {
+function Userlist(props) {
   const [modalShow, setModalShow] = useState(false);
   const [editModalShow, setEditModalShow] = useState(false);
   const [transactionType, settransactionType] = useState('');
@@ -288,7 +288,6 @@ function Userlist() {
                 }}
               />
             </InputGroup>
-            
           </div>
           <div className="flex-table-header">
             <div className="transaction-userlist">User</div>
@@ -345,9 +344,15 @@ function Userlist() {
                   <Button variant="link" onClick={(e) => modalToggle(e, item?._id)}><EyeIcon width="22" height="22" />View Details</Button>
                   <Button variant="link" onClick={(e) => editModalToggle(e, item?._id)}><EditICon width="22" height="20" />Edit Details</Button>
                   {item?.is_2FA_enabled === true && (<Button variant="link" onClick={() => twoFADiasableUser(item?._id)}><DisabledIcon width="22" height="20" />2FA Disable</Button>)}
-                  {item?.status === "Active" && (<Button variant="link" onClick={() => suspendUser(item?._id)}><CancelIcon width="22" height="20" />Suspend</Button>)}
-                  {item?.status === "Suspend" && (<Button variant="link" onClick={() => activeUser(item?._id)}><CheckBoxIcon width="22" height="20" />Active</Button>)}
-                  <Button variant="link" onClick={() => deleteUserKyc(item?._id)}><TrashIcon width="22" height="20" />Delete</Button>
+                  {item?.status === "Active" && (props.roleId != 2) && (
+                    <Button variant="link" onClick={() => suspendUser(item?._id)}><CancelIcon width="22" height="20" />Suspend</Button>
+                  )}
+                  {item?.status === "Suspend" && (
+                  <Button variant="link" onClick={() => activeUser(item?._id)}><CheckBoxIcon width="22" height="20" />Active</Button>
+                  )}
+                  {(props.roleId != 2) && (
+                    <Button variant="link" onClick={() => deleteUserKyc(item?._id)}><TrashIcon width="22" height="20" />Delete</Button>
+                  )}
                 </DropdownButton>
               </div>
             </div>

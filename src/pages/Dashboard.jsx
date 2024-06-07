@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getTokenCount,
   getTotalMid,
-  resetRaisedMid,
   resetTokenData,
 } from "../store/slices/currencySlice";
 import { formattedNumber, getDateFormate } from "../utils";
@@ -19,18 +18,15 @@ import jwtAxios from "../service/jwtAxios";
 import { getUsersCount } from "../store/slices/UserSlice";
 
 function Dashboard() {
-  const MAX = 14000000;
   const [transactions, setTransactions] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const [totalUser, setTotalUser] = useState(null);
-  // const [totalKYCUser, setTotalKYCUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [sinceLastWeekUserCount, setSinceLastWeekUserCount] = useState(0);
-  // const [sinceLastWeekKYCUserCount, setSinceLastWeekKYCUserCount] = useState(0);
   const [sinceLastWeekSale, setSinceLastWeekSale] = useState(0);
   const [userType, setUserType] = useState("user");
   const [transactionLoading, setTransactionLoading] = useState(false);
+  const { sales } = useSelector((state) => state?.currenyReducer);
+
   const totalUser = useSelector(
     (state) => state.userReducer?.totalUser
   );
@@ -46,13 +42,13 @@ function Dashboard() {
   const authToken = useSelector(
     (state) => state.authenticationReducer?.authToken
   );
-  const { raisedMid, tokenData } = useSelector((state) => state?.currenyReducer);
+  const { tokenData } = useSelector((state) => state?.currenyReducer);
+ 
   useEffect(() => {
     if (authToken) {
       dispatch(getTotalMid()).unwrap();
       dispatch(getTokenCount()).unwrap();
     } else {
-      dispatch(resetRaisedMid());
       dispatch(resetTokenData());
     }
   }, [dispatch, authToken]);
@@ -128,7 +124,12 @@ function Dashboard() {
                 <div className="token-avatar"></div>
                 <div>
                   <div className="token-text">Amount collected</div>
-                  <div className="token-amount">{raisedMid ? formattedNumber(raisedMid) : 0} <span>MID</span></div>
+                  {/* <div className="token-amount">{raisedMid ? formattedNumber(raisedMid) : 0} <span>MID</span></div> */}
+                  <div className="token-amount"> {tokenData &&
+                  tokenData?.totalUserCount
+                  ? tokenData?.totalUserCount
+                  : 0}</div>
+                 
                 </div>
               </div>
               <h5>The Contributor</h5>
@@ -177,7 +178,11 @@ function Dashboard() {
               <Row>
                 <Col md="6">
                   <h4>TOKEN SALE - COIN</h4>
-                  <div className="coin-number">{ raisedMid !== null ? parseFloat(formattedNumber(MAX - raisedMid)).toLocaleString() : 0} <Badge bg="success">0,2 %</Badge></div>
+                  {/* <div className="coin-number">{ raisedMid !== null ? parseFloat(formattedNumber(MAX - raisedMid)).toLocaleString() : 0} <Badge bg="success">0,2 %</Badge></div> */}
+                  <div className="coin-number">
+                    {sales && sales?.total ? sales?.total : 0}
+                    <Badge bg="success">0,2 %</Badge>
+                  </div>
                   <p>{sinceLastWeekSale?sinceLastWeekSale:0} since last week</p>
                   <Button variant="primary" size="sm" onClick={viewAllTransactions}>View all</Button>
                 </Col>

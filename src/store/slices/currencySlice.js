@@ -10,12 +10,13 @@ const initialState = {
   gbpCurrency: "",
   usdCurrency: "",
   cryptoAmount: 0,
-  raisedMid: null,
   balanceMid: 0,
   tokenData: {
     gbpCount: 0,
     eurCount: 0,
     audCount: 0,
+    usdCount: 0,
+    totalUserCount: 0
   },
   orderId: null,
   orderData: {},
@@ -93,62 +94,29 @@ export const getUSDCurrency = createAsyncThunk(
   }
 );
 
-export const getCryptoCurrency = createAsyncThunk(
-  "getCryptoCurrency",
-  async (action, { dispatch }) => {
-    try {
-      const response = await jwtAxios
-        .get(`users/getCryptoCurrencyDetails`)
-        .then((response) => response.json())
-        .then((data) => {
-          return data;
-        });
-      return response;
-    } catch (error) {
-      return error.message;
-    }
-  }
-);
-
-export const convertToCrypto = createAsyncThunk(
-  "convertToCrypto",
-  async (action, { dispatch }) => {
-    try {
-      const res = await jwtAxios
-        .post(`transactions/getCryptoAmountDetails`, action)
-        .then((response) => {
-          return response?.data;
-        });
-      return res;
-    } catch (error) {
-      dispatch(notificationFail(error?.response?.data?.message));
-    }
-  }
-);
-
-export const coingateAuthentication = createAsyncThunk(
-  "coingateAuthentication",
-  async (action, { dispatch }) => {
-    try {
-      const res = await axios
-        .post(
-          `https://api.coingate.com/v2/auth/test`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer e8DkjHWvbQghH6RTwSkg3aQNStFVqE-CQsbo5xR-`,
-            },
-          }
-        )
-        .then((response) => {
-          return response?.data;
-        });
-      return res;
-    } catch (error) {
-      dispatch(notificationFail(error?.response?.data?.message));
-    }
-  }
-);
+// export const coingateAuthentication = createAsyncThunk(
+//   "coingateAuthentication",
+//   async (action, { dispatch }) => {
+//     try {
+//       const res = await axios
+//         .post(
+//           `https://api.coingate.com/v2/auth/test`,
+//           {},
+//           {
+//             headers: {
+//               Authorization: `Bearer e8DkjHWvbQghH6RTwSkg3aQNStFVqE-CQsbo5xR-`,
+//             },
+//           }
+//         )
+//         .then((response) => {
+//           return response?.data;
+//         });
+//       return res;
+//     } catch (error) {
+//       dispatch(notificationFail(error?.response?.data?.message));
+//     }
+//   }
+// );
 
 export const getTotalMid = createAsyncThunk(
   "getTotalMid",
@@ -196,14 +164,26 @@ export const getTransactionByOrderId = createAsyncThunk(
   }
 );
 
+export const checkCurrentSale = createAsyncThunk(
+  "checkCurrentSale",
+  async (action, { dispatch }) => {
+    try {
+      const res = await jwtAxios
+        .get(`transactions/checkSale`)
+        .then((response) => {
+          return response?.data?.sales;
+        });
+      return res;
+    } catch (error) {
+      dispatch(notificationFail(error?.response?.data?.message));
+    }
+  }
+);
+
 const currencySlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    resetRaisedMid: (state, { payload }) => ({
-      ...state,
-      raisedMid: null,
-    }),
     resetTokenData: (state, { payload }) => ({
       ...state,
       tokenData: { gbpCount: 0, eurCount: 0, audCount: 0 },
@@ -243,17 +223,16 @@ const currencySlice = createSlice({
         }
         state.usdCurrency = action.payload;
       })
-      .addCase(convertToCrypto.fulfilled, (state, action) => {
-        if (!action?.payload) {
-          return;
-        }
-        state.cryptoAmount = action.payload;
-      })
+      // .addCase(convertToCrypto.fulfilled, (state, action) => {
+      //   if (!action?.payload) {
+      //     return;
+      //   }
+      //   state.cryptoAmount = action.payload;
+      // })
       .addCase(getTotalMid.fulfilled, (state, action) => {
         if (!action?.payload) {
           return;
         }
-        state.raisedMid = action.payload.totalAmount;
         state.balanceMid = action.payload.totalAmount;
       })
       .addCase(getTokenCount.fulfilled, (state, action) => {
@@ -267,9 +246,15 @@ const currencySlice = createSlice({
           return;
         }
         state.orderData = action.payload;
+      })
+      .addCase(checkCurrentSale.fulfilled, (state, action) => {
+        if (!action?.payload) {
+          return;
+        }
+        state.sales = action.payload;
       });
   },
 });
-export const { resetRaisedMid, resetTokenData, resetCryptoAmount, setOrderId } =
+export const { resetTokenData, resetCryptoAmount, setOrderId } =
   currencySlice.actions;
 export default currencySlice.reducer;

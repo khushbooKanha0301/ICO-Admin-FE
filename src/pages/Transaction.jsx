@@ -28,8 +28,6 @@ function Transaction() {
   const [stateTransactions, setStateTransactions] = useState(null);
   const [searchTrnx, setSearchTrnx] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  // const [isTypeChecked, setIsTypeChecked] = useState([]);
-  // const [isStatusChecked, setIsStatusChecked] = useState([]);
   const [isComponentMounted, setIsComponentMounted] = useState(false);
   const [transactionLoading, setTransactionLoading] = useState(true);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
@@ -98,15 +96,6 @@ function Transaction() {
     setStatusFilter(status);
   };
 
-  // const onSelectTypes = (e, types) => {
-  //   if (e.target.checked) {
-  //     setIsTypeChecked((prevValues) => [...prevValues, types]);
-  //   } else {
-  //     setIsTypeChecked((prevValues) => prevValues.filter((v) => v !== types));
-  //   }
-  //   setCurrentPage(1);
-  // };
-
   const handleFilterTypeChange = (filterType) => {
     setIsTypeChecked((prevValues) => {
       if (prevValues.includes(filterType)) {
@@ -117,17 +106,6 @@ function Transaction() {
     });
     setCurrentPage(1);
   };
-
-  // const onSelectStatus = (e, status) => {
-  //   if (e.target.checked) {
-  //     setIsStatusChecked((prevValues) => [...prevValues, status]);
-  //   } else {
-  //     setIsStatusChecked((prevValues) =>
-  //       prevValues.filter((v) => v !== status)
-  //     );
-  //   }
-  //   setCurrentPage(1);
-  // };
 
   const handleFilterStatusChange = (event) => {
     setIsStatusChecked((prevValues) => {
@@ -158,13 +136,6 @@ function Transaction() {
                 variant="outline-secondary"
               >
                 All
-              </Button>
-              <Button
-                onClick={() => changeStatus("new")}
-                className={statusFilter === "new" ? "active" : ""}
-                variant="outline-secondary"
-              >
-                New
               </Button>
               <Button
                 onClick={() => changeStatus("pending")}
@@ -208,22 +179,6 @@ function Transaction() {
               title={<SettingIcon width="24" height="24" />}
             >
               <div className="dropdown-title">TYPES</div>
-              {/* <Form.Check
-                label="Referral"
-                name="setting-type"
-                type="checkbox"
-                id="setting-type"
-                onChange={(e) => onSelectTypes(e, "referral")}
-              />
-
-              <Form.Check
-                label="Purchase"
-                name="setting-type"
-                type="checkbox"
-                id="setting-type1"
-                onChange={(e) => onSelectTypes(e, "purchase")}
-              /> */}
-
               <div
                 className="form-check"
                 onClick={() => handleFilterTypeChange("referral")}
@@ -251,19 +206,6 @@ function Transaction() {
 
               <Dropdown.Divider />
               <div className="dropdown-title">STATUS</div>
-
-              <div
-                className="form-check"
-                onClick={() => handleFilterStatusChange("new")}
-              >
-                <div
-                  className={`form-check-input ${
-                    isStatusChecked.includes("new") ? "checked" : ""
-                  }`}
-                />
-                <label class="form-check-label">New</label>
-              </div>
-
               <div
                 className="form-check"
                 onClick={() => handleFilterStatusChange("pending")}
@@ -345,21 +287,18 @@ function Transaction() {
             <div className="flex-table-body" key={transaction?._id}>
               <div className="transaction-tranx-no">
                 <div className="tranx-icon">
-                  {transaction?.status === "paid" && (
+                {transaction?.status == "paid" && (
                     <CheckCircleIcon width="32" height="33" />
                   )}
-                  {(transaction?.status === "canceled" ||
-                    transaction?.status === "expired" ||
-                    transaction?.status === "invalid") && (
+                  {transaction?.status == "failed" && (
                     <CloseIcon width="32" height="33" />
                   )}
-                  {(transaction?.status === "new" ||
-                    transaction?.status === "pending") && (
-                    <ExclamationIcon width="32" height="33" />
+                  {transaction?.status == "pending" && (
+                    <ExclamationIcon width="30" height="29" />
                   )}
                 </div>
                 <div>
-                  <p className="text-white mb-1">{transaction?.tran_id}</p>
+                  <p className="text-white mb-1">{transaction?.transactionHash}</p>
                   <p>
                     {getDateFormate(
                       transaction?.created_at,
@@ -442,13 +381,13 @@ function Transaction() {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          <div className="table-info">
+          {/* <div className="table-info">
             {currentPage === 1
               ? `${totalTransactionsCount > 0 ? 1 : 0}`
               : `${(currentPage - 1) * PageSize + 1}`}{" "}
             - {`${Math.min(currentPage * PageSize, totalTransactionsCount)}`} of{" "}
             {totalTransactionsCount}
-          </div>
+          </div> */}
         </div>
       )}
       <TransactionDetails

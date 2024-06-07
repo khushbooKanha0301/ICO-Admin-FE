@@ -29,7 +29,7 @@ import { notificationFail } from "../store/slices/notificationSlice";
 import PaginationComponent from "../components/Pagination";
 import { hideAddress } from "../utils";
 
-function Kyclist() {
+function Kyclist(props) {
   const [modalShow, setModalShow] = useState(false);
   const [transactionType, settransactionType] = useState("");
   const dispatch = useDispatch();
@@ -382,13 +382,17 @@ function Kyclist() {
                         </Button>
                       </>
                     )}
-                    <Button
-                      variant="link"
-                      onClick={() => deleteUserKyc(item?._id)}
-                    >
-                      <TrashIcon width="22" height="20" />
-                      Delete
-                    </Button>
+                    {(props.roleId != 2) && (
+                      <>
+                        <Button
+                        variant="link"
+                        onClick={() => deleteUserKyc(item?._id)}
+                        >
+                          <TrashIcon width="22" height="20" />
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </DropdownButton>
                 </div>
               </div>
@@ -413,13 +417,13 @@ function Kyclist() {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          <div className="table-info">
+          {/* <div className="table-info">
             {currentPage === 1
               ? `${totalUsersCount > 0 ? 1 : 0}`
               : `${(currentPage - 1) * PageSize + 1}`}{" "}
             - {`${Math.min(currentPage * PageSize, totalUsersCount)}`} of{" "}
             {totalUsersCount}
-          </div>
+          </div> */}
         </div>
       )}
       <KYCDetails

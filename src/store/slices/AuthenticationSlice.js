@@ -5,11 +5,13 @@ import { setLoading } from "./commonSlice";
 import { notificationFail, notificationSuccess } from "./notificationSlice";
 
 const authToken = window.localStorage.getItem("authToken") || null;
+const roleId = window.localStorage.getItem("roleId") || null;
 
 const userId = window.localStorage.getItem("userId") || null;
 const initialState = {
   authToken: authToken,
   userId: userId,
+  roleId: roleId,
   SAL: null,
 };
 
@@ -32,6 +34,7 @@ export const login = createAsyncThunk("login", async (action, { dispatch }) => {
       return {
         authToken: res.data?.token,
         userId: res.data?.userId,
+        roleId: res.data?.roleId,
         ...action,
       };
     }
@@ -81,16 +84,20 @@ const authenticationSlice = createSlice({
         }
         state.authToken = action.payload?.authToken;
         state.userId = action.payload?.userId;
+        state.roleId = action.payload?.roleId;
         window.localStorage.setItem("authToken", action.payload?.authToken);
         window.localStorage.setItem("userId", action.payload?.userId);
+        window.localStorage.setItem("roleId", action.payload?.roleId);
       })
       .addCase(logout.fulfilled, (state, action) => {
         if (!action?.payload) {
           return;
         }
         window.localStorage.removeItem("authToken");
+        window.localStorage.removeItem("roleId");
 
         state.authToken = null;
+        state.roleId = null;
       });
   },
 });

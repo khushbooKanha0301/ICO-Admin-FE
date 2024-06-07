@@ -29,6 +29,7 @@ jwtAxios.interceptors.request.use(
       }
     }
     config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    config.headers['RoleId'] = `${localStorage.getItem('roleId')}`;
         return config;
     },
     error => {

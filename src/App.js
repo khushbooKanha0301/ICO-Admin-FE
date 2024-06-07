@@ -16,6 +16,7 @@ import TransactionComponent from "./pages/Transaction";
 import ResetPasswordComponent from "./components/ResetPasswordComponent";
 import { useJwt } from "react-jwt";
 import { setSAL } from "./store/slices/AuthenticationSlice";
+import { checkCurrentSale} from "./store/slices/currencySlice";
 
 export const App = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -23,21 +24,26 @@ export const App = () => {
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isResponsive, setIsResponsive] = useState(false);
+  
   const dispatch = useDispatch();
-  const token = localStorage.getItem("token") || "";
-  
-  const { decodedToken } = useJwt(token);
-  useEffect(() => {
-    if(decodedToken)
-    {
-      dispatch(setSAL(decodedToken.access)); 
-    }
-  },[decodedToken])
-  
-  const SAL = useSelector((state) => state.authenticationReducer?.SAL) || null;
 
   const authToken =
     useSelector((state) => state.authenticationReducer?.authToken) || null;
+  let roleId =
+    useSelector((state) => state.authenticationReducer?.roleId) || null;
+  roleId = Number(roleId);
+
+  const token = localStorage.getItem("token") || "";
+  const { decodedToken } = useJwt(token);
+  
+  useEffect(() => {
+    if (decodedToken && roleId) {
+      dispatch(setSAL(decodedToken.access));
+      dispatch(checkCurrentSale());
+    }
+  }, [decodedToken, roleId]);
+
+  const SAL = useSelector((state) => state.authenticationReducer?.SAL) || null;
 
   useEffect(() => {
     const handleResize = () => {
@@ -90,7 +96,7 @@ export const App = () => {
                     path="/kyc-list"
                     element={
                       <AuthRoute>
-                        <KYCListComponent />
+                        <KYCListComponent roleId={roleId} />
                       </AuthRoute>
                     }
                   />
@@ -106,7 +112,7 @@ export const App = () => {
                     path="/users-list"
                     element={
                       <AuthRoute>
-                        <UserListComponent />
+                        <UserListComponent roleId={roleId} />
                       </AuthRoute>
                     }
                   />
