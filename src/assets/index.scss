@@ -1437,6 +1437,17 @@ body {
         }
     }
 
+    .btn-outline-pending {
+        color: #F3BA2F;
+        background: rgba(243, 186, 47, 0.3);
+        border-color: #F3BA2F;
+        border: 1px solid #F3BA2F;
+        border-radius: 6px;
+        padding: 8.5px 12px;
+        width: 100%;
+        max-width: 82px;
+    }
+
     .btn-group {
         .btn {
             width: 36px;

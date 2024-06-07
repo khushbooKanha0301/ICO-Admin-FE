@@ -241,38 +241,6 @@ function Transaction() {
                 />
                 <label class="form-check-label">Expired</label>
               </div>
-
-              {/* <Form.Check
-                label="New"
-                name="setting-status"
-                type="checkbox"
-                id="setting-status"
-                onChange={(e) => onSelectStatus(e, "new")}
-              />
-
-              <Form.Check
-                label="Pending"
-                name="setting-status"
-                type="checkbox"
-                id="setting-status1"
-                onChange={(e) => onSelectStatus(e, "pending")}
-              />
-
-              <Form.Check
-                label="Paid"
-                name="setting-status"
-                type="checkbox"
-                id="setting-status2"
-                onChange={(e) => onSelectStatus(e, "paid")}
-              />
-
-              <Form.Check
-                label="Expired"
-                name="setting-status"
-                type="checkbox"
-                id="setting-status3"
-                onChange={(e) => onSelectStatus(e, "expired")}
-              />  */}
             </DropdownButton>
           </div>
           <div className="flex-table-header">
@@ -287,7 +255,7 @@ function Transaction() {
             <div className="flex-table-body" key={transaction?._id}>
               <div className="transaction-tranx-no">
                 <div className="tranx-icon">
-                {transaction?.status == "paid" && (
+                  {transaction?.status == "paid" && (
                     <CheckCircleIcon width="32" height="33" />
                   )}
                   {transaction?.status == "failed" && (
@@ -298,7 +266,7 @@ function Transaction() {
                   )}
                 </div>
                 <div>
-                  <p className="text-white mb-1">{transaction?.transactionHash}</p>
+                  <p className="text-white mb-1">{transaction?._id}</p>
                   <p>
                     {getDateFormate(
                       transaction?.created_at,
@@ -344,12 +312,22 @@ function Transaction() {
               </div>
               <div className="transaction-type">
                 <div className="d-flex justify-content-between align-items-center">
-                  <Button variant="outline-success">
-                    {transaction.source
-                      ? transaction.source.charAt(0).toUpperCase() +
-                        transaction.source.slice(1)
-                      : "Purchase"}
-                  </Button>
+                  {transaction?.status == "paid" && (
+                    <Button variant="outline-success">
+                      Confirmed 
+                    </Button>
+                  )}
+                  {transaction?.status == "failed" && (
+                    <Button variant="outline-danger">
+                      Failed 
+                    </Button>                  
+                  )}
+                  {transaction?.status == "pending" && (
+                    <Button variant="outline-pending">
+                      UnConfirmed 
+                    </Button>
+                  )}
+
                   <ButtonGroup aria-label="Transaction Action">
                     <Button
                       variant="secondary"
@@ -381,13 +359,6 @@ function Transaction() {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          {/* <div className="table-info">
-            {currentPage === 1
-              ? `${totalTransactionsCount > 0 ? 1 : 0}`
-              : `${(currentPage - 1) * PageSize + 1}`}{" "}
-            - {`${Math.min(currentPage * PageSize, totalTransactionsCount)}`} of{" "}
-            {totalTransactionsCount}
-          </div> */}
         </div>
       )}
       <TransactionDetails
