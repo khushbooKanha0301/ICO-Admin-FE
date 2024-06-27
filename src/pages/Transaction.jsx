@@ -152,11 +152,11 @@ function Transaction() {
                 Paid
               </Button>
               <Button
-                onClick={() => changeStatus("expired")}
-                className={statusFilter === "expired" ? "active" : ""}
+                onClick={() => changeStatus("failed")}
+                className={statusFilter === "failed" ? "active" : ""}
                 variant="outline-secondary"
               >
-                Expired
+                Failed
               </Button>
             </ButtonGroup>
             <InputGroup>
@@ -232,24 +232,25 @@ function Transaction() {
 
               <div
                 className="form-check"
-                onClick={() => handleFilterStatusChange("expired")}
+                onClick={() => handleFilterStatusChange("failed")}
               >
                 <div
                   className={`form-check-input ${
-                    isStatusChecked.includes("expired") ? "checked" : ""
+                    isStatusChecked.includes("failed") ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">Expired</label>
+                <label class="form-check-label">Failed</label>
               </div>
             </DropdownButton>
           </div>
           <div className="flex-table-header">
             <div className="transaction-tranx-no">Tranx No</div>
+            <div className="transaction-usd-amount">USDT Amount</div>
             <div className="transaction-token">Token</div>
-            <div className="transaction-amount">Amount</div>
-            <div className="transaction-usd-amount">USD Amount</div>
+            <div className="transaction-amount">Network</div>
             <div className="transaction-from">Pay from</div>
-            <div className="transaction-type">Type</div>
+            <div className="transaction-web-type">Type</div>
+            <div className="transaction-status">Status</div>
           </div>
           {transactions?.map((transaction) => (
             <div className="flex-table-body" key={transaction?._id}>
@@ -275,29 +276,25 @@ function Transaction() {
                   </p>
                 </div>
               </div>
-              <div className="transaction-token">
-                <p className="text-white mb-1">
-                  {transaction?.token_cryptoAmount <= 200
-                    ? formattedNumber(transaction?.token_cryptoAmount)
-                    : "+200"}
-                </p>
-                <p>Token</p>
-              </div>
-              <div className="transaction-amount">
-                <p className="text-white mb-1">
-                  {formattedNumber(transaction?.price_amount)}
-                </p>
-                <p>{transaction?.price_currency}</p>
-              </div>
               <div className="transaction-usd-amount">
                 <p className="text-white mb-1">
                   {formattedNumber(
-                    transaction?.usd_amount
-                      ? transaction?.usd_amount
-                      : transaction?.price_amount
+                    transaction?.price_amount
                   )}
                 </p>
                 <p>{transaction?.receive_currency}</p>
+              </div>
+              <div className="transaction-token">
+                <p className="text-white mb-1">
+                  {transaction?.is_sale ? transaction?.token_cryptoAmount <= 200
+                    ? formattedNumber(transaction?.token_cryptoAmount)
+                    : "+200" : "0.00" }
+                </p>
+              </div>
+              <div className="transaction-amount">
+                <p className="text-white mb-1">
+                {transaction?.network}
+                </p>
               </div>
               <div className="transaction-from">
                 <p className="text-white mb-1">
@@ -310,7 +307,12 @@ function Transaction() {
                   )}
                 </p>
               </div>
-              <div className="transaction-type">
+              <div className="transaction-web-type">
+                <div className="d-flex justify-content-between align-items-center">
+                  {transaction?.sale_type == "website" ? "Website": "Outside-Web"}
+                </div>
+              </div>
+              <div className="transaction-status">
                 <div className="d-flex justify-content-between align-items-center">
                   {transaction?.status == "paid" && (
                     <Button variant="outline-success">

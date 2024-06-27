@@ -12,11 +12,8 @@ const initialState = {
   cryptoAmount: 0,
   balanceMid: 0,
   tokenData: {
-    gbpCount: 0,
-    eurCount: 0,
-    audCount: 0,
-    usdCount: 0,
-    totalUserCount: 0
+    totalUserCount: 0,
+    totalUsdtCount: 0
   },
   orderId: null,
   orderData: {},
@@ -94,30 +91,6 @@ export const getUSDCurrency = createAsyncThunk(
   }
 );
 
-// export const coingateAuthentication = createAsyncThunk(
-//   "coingateAuthentication",
-//   async (action, { dispatch }) => {
-//     try {
-//       const res = await axios
-//         .post(
-//           `https://api.coingate.com/v2/auth/test`,
-//           {},
-//           {
-//             headers: {
-//               Authorization: `Bearer e8DkjHWvbQghH6RTwSkg3aQNStFVqE-CQsbo5xR-`,
-//             },
-//           }
-//         )
-//         .then((response) => {
-//           return response?.data;
-//         });
-//       return res;
-//     } catch (error) {
-//       dispatch(notificationFail(error?.response?.data?.message));
-//     }
-//   }
-// );
-
 export const getTotalMid = createAsyncThunk(
   "getTotalMid",
   async (action, { dispatch }) => {
@@ -140,7 +113,7 @@ export const getTokenCount = createAsyncThunk(
       const res = await jwtAxios
         .get(`transactions/getTokenCount`, action)
         .then((response) => {
-          return response?.data?.tokenData;
+          return response?.data?.totalTokenCount;
         });
       return res;
     } catch (error) {
@@ -186,11 +159,7 @@ const currencySlice = createSlice({
   reducers: {
     resetTokenData: (state, { payload }) => ({
       ...state,
-      tokenData: { gbpCount: 0, eurCount: 0, audCount: 0 },
-    }),
-    resetCryptoAmount: (state, { payload }) => ({
-      ...state,
-      cryptoAmount: 0,
+      tokenData: { totalUserCount: '0.00', totalUsdtCount: '0.00' }
     }),
     setOrderId: (state, { payload }) => ({
       ...state,
@@ -223,12 +192,6 @@ const currencySlice = createSlice({
         }
         state.usdCurrency = action.payload;
       })
-      // .addCase(convertToCrypto.fulfilled, (state, action) => {
-      //   if (!action?.payload) {
-      //     return;
-      //   }
-      //   state.cryptoAmount = action.payload;
-      // })
       .addCase(getTotalMid.fulfilled, (state, action) => {
         if (!action?.payload) {
           return;
@@ -255,6 +218,6 @@ const currencySlice = createSlice({
       });
   },
 });
-export const { resetTokenData, resetCryptoAmount, setOrderId } =
+export const { resetTokenData, setOrderId } =
   currencySlice.actions;
 export default currencySlice.reducer;

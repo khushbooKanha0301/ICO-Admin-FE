@@ -1179,7 +1179,7 @@ body {
 .transaction-list {
 
     .btn[class*="btn-outline-"] {
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
         line-height: 20px;
         border: 1px solid;
@@ -1191,9 +1191,9 @@ body {
         &[class$="success"],
         &[class$="approved"],
         &[class$="active"] {
-            border: none;
-            color: #a0fb63;
-            background: rgba(160, 251, 99, 0.2);
+            color: #99FC79;
+            background: rgba(153, 252, 121, 0.3);
+            border-color: #99FC79;
 
             &:hover {
                 background: #99FC79;
@@ -1233,6 +1233,24 @@ body {
                 background: #FC7979;
                 color: #1E1F24;
             }
+        }
+    }
+
+    .btn-outline-pending {
+        color: #F3BA2F;
+        background: rgba(243, 186, 47, 0.3);
+        border-color: #F3BA2F;
+        border: 1px solid #F3BA2F;
+    }
+
+    .btn-outline-danger {
+        background: rgba(253, 92, 109, 0.21);
+        border: 1px solid #fd5c6d;
+        color: #fd5c6d;
+
+        &:hover {
+            background: #fd5c6d;
+            color: $white;
         }
     }
 
@@ -1380,7 +1398,7 @@ body {
     }
 
     .btn[class*="btn-outline-"] {
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
         line-height: 20px;
         border: 1px solid;
@@ -1442,10 +1460,17 @@ body {
         background: rgba(243, 186, 47, 0.3);
         border-color: #F3BA2F;
         border: 1px solid #F3BA2F;
-        border-radius: 6px;
-        padding: 8.5px 12px;
-        width: 100%;
-        max-width: 82px;
+    }
+
+    .btn-outline-danger {
+        background: rgba(253, 92, 109, 0.21);
+        border: 1px solid #fd5c6d;
+        color: #fd5c6d;
+
+        &:hover {
+            background: #fd5c6d;
+            color: $white;
+        }
     }
 
     .btn-group {
@@ -1504,14 +1529,28 @@ body {
                 align-items: center;
             }
 
-            &.transaction-token,
-            &.transaction-amount,
             &.transaction-usd-amount {
                 flex: 0 0 12%;
             }
 
+            &.transaction-token {
+                flex: 0 0 8%;
+            }
+
+            &.transaction-amount {
+                flex: 0 0 9%;
+            }
+
             &.transaction-from {
                 flex: 0 0 18%;
+            }
+
+            &.transaction-web-type {
+                flex: 0 0 12%;
+            }
+
+            &.transaction-type {
+                flex: 0 0 24%;
             }
 
             &.transaction-user {
@@ -1539,10 +1578,12 @@ body {
                     opacity: 0.6;
                 }
             }
+            &.transaction-status {
+                flex: 0 0 19%;
+            }
 
             &.transaction-type {
-                flex: 0 0 24%;
-
+                
                 .dropdown-toggle {
                     background: rgba(255, 255, 255, 0.21);
 
@@ -2650,6 +2691,7 @@ img.circle-data {
             height: 295px;
             overflow: auto;
         }
+
         .dropdown-menu-inner {
             .form-control {
                 margin-bottom: 0px !important;
@@ -2706,10 +2748,12 @@ img.circle-data {
             padding: 5px 0px;
         }
     }
+
     .filter-option.phone-number-filter {
         height: 170px;
-        overflow: auto; 
+        overflow: auto;
     }
+
     .filter-option.location-filter {
         height: 160px;
         overflow: auto;
@@ -2975,23 +3019,23 @@ img.circle-data {
     line-height: 37px;
     color: #808191;
     border-radius: 0;
-  
+
     @include media-breakpoint-down(md) {
-      line-height: 40px;
-      font-size: 16px;
+        line-height: 40px;
+        font-size: 16px;
     }
 }
 
 .mobile-setting-dropdown {
     width: 120px;
 }
-  
+
 .personalDataLocation {
     overflow: hidden;
     white-space: nowrap;
     width: 40px;
 }
-  
+
 .react-modal-sheet-drag-indicator {
     background: #40434F !important;
     width: 29.5px !important;
@@ -3017,6 +3061,7 @@ img.circle-data {
 }
 
 .react-datepicker__header__dropdown {
+
     .react-datepicker__month-select,
     .react-datepicker__year-select {
         background: #48484859;

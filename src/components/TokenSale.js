@@ -106,31 +106,6 @@ export const TokenSale = () => {
       <Card.Body>
         <div className="d-flex justify-content-between align-items-center">
           <Card.Title as="h3">Token Sale Graph</Card.Title>
-        
-          {/* <div className="customSelectBox" ref={countryDropdownRef}>
-            <div
-              className="form-select"
-              onClick={toggleOptions}
-              aria-label="This Week"
-            >
-              {graphOptions.find((cat) => cat.value === filterValue)?.label ||
-                ""}
-            </div>
-            {showOptions && (
-              <ul className="options">
-                {graphOptions.map((option, index) => (
-                  <li
-                    key={index}
-                    onClick={() => {handleSelectedClick(option.value);
-                      setFilterLabel(option.label)}
-                    }
-                  >
-                    {option.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div> */}
           <div
             className={`statisticBox d-flex items-center phone-number-dropdown justify-between relative token-sales-filter`}
           >
