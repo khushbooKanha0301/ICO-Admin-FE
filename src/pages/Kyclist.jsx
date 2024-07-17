@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Button,
   DropdownButton,
-  Pagination,
-  Modal,
-  Nav,
-  NavDropdown,
-  Navbar,
-  Table,
   ButtonGroup,
   InputGroup,
   Form,
@@ -28,6 +22,7 @@ import jwtAxios from "../service/jwtAxios";
 import { notificationFail } from "../store/slices/notificationSlice";
 import PaginationComponent from "../components/Pagination";
 import { hideAddress } from "../utils";
+import { useSelector } from "react-redux";
 
 function Kyclist(props) {
   const [modalShow, setModalShow] = useState(false);
@@ -42,6 +37,13 @@ function Kyclist(props) {
   const [isComponentMounted, setIsComponentMounted] = useState(false);
   const [kycLoading, setKycLoading] = useState(true);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
+  const [setPermissions, setAdminPermissions] = useState([]);
+ 
+  let userId =
+    useSelector((state) => state.authenticationReducer?.userId) || null;
+  let roleId =
+    useSelector((state) => state.authenticationReducer?.roleId) || null;
+  roleId = Number(roleId);
 
   const [currentPage, setCurrentPage] = useState(1);
   const getKYC = async () => {
@@ -64,6 +66,23 @@ function Kyclist(props) {
         });
     }
   };
+
+  const fetchSubadminById = (id) => {
+    jwtAxios
+      .get(`/auth/getSubAdminPermission/${id}`)
+      .then((res) => {
+        setAdminPermissions(res?.data?.fetchUser?.permissions);
+      })
+      .catch((error) => {
+        dispatch(notificationFail(error?.response?.data?.message));
+      });
+  };
+
+  useEffect(() => {
+    if (userId && roleId === 3) {
+      fetchSubadminById(userId);
+    }
+  }, [userId, roleId]);
 
   useEffect(() => {
     if (isComponentMounted) {
@@ -152,6 +171,7 @@ function Kyclist(props) {
       }
     });
   };
+
   const deleteUserKyc = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -309,7 +329,11 @@ function Kyclist(props) {
                   <>
                     <a
                       className="passport-image"
-                      style={{ color: "gray", textDecoration: "none", display: "flex" }}
+                      style={{
+                        color: "gray",
+                        textDecoration: "none",
+                        display: "flex",
+                      }}
                       onClick={() => handlePassportImageDownload(item?._id)}
                       download
                     >
@@ -327,7 +351,11 @@ function Kyclist(props) {
                   <>
                     <a
                       className="passport-image"
-                      style={{ color: "gray", textDecoration: "none" , display: "flex"}}
+                      style={{
+                        color: "gray",
+                        textDecoration: "none",
+                        display: "flex",
+                      }}
                       onClick={() => handleUserImageDownload(item?._id)}
                       download
                     >
@@ -382,17 +410,34 @@ function Kyclist(props) {
                         </Button>
                       </>
                     )}
-                    {(props.roleId != 2) && (
+                    {props.roleId == 1 && (
                       <>
                         <Button
-                        variant="link"
-                        onClick={() => deleteUserKyc(item?._id)}
+                          variant="link"
+                          onClick={() => deleteUserKyc(item?._id)}
                         >
                           <TrashIcon width="22" height="20" />
                           Delete
                         </Button>
                       </>
                     )}
+
+                    {setPermissions?.map((permission) => {
+                      if (permission.permission_id === 3) {
+                        return (
+                          <>
+                            <Button
+                              variant="link"
+                              onClick={() => deleteUserKyc(item?._id)}
+                            >
+                              <TrashIcon width="22" height="20" />
+                              Delete
+                            </Button>
+                          </>
+                        );
+                      }
+                      return null;
+                    })}
                   </DropdownButton>
                 </div>
               </div>

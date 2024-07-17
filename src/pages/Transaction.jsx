@@ -16,57 +16,24 @@ import {
   SearchIcon,
 } from "../components/SVGIcon";
 import TransactionDetails from "../components/TransactionDetails";
-import jwtAxios from "../service/jwtAxios";
 import { formattedNumber, getDateFormate } from "../utils";
 import PaginationComponent from "../components/Pagination";
-import * as flatted from "flatted";
-let PageSize = 5;
-function Transaction() {
+
+function Transaction(props) {
+  const { setCurrentPage , transactionLoading, transactions , totalTransactionsCount, isTypeChecked , setIsTypeChecked, isStatusChecked,
+    setIsStatusChecked, setSearchTrnx, setStatusFilter, statusFilter, searchTrnx, gettransaction , currentPage, PageSize
+  } = props
   const [modalShow, setModalShow] = useState(false);
-  const [transactions, setTransactions] = useState(null);
-  const [totalTransactionsCount, setTotalTransactionsCount] = useState(0);
+ 
   const [stateTransactions, setStateTransactions] = useState(null);
-  const [searchTrnx, setSearchTrnx] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
   const [isComponentMounted, setIsComponentMounted] = useState(false);
-  const [transactionLoading, setTransactionLoading] = useState(true);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
-
-  const [isTypeChecked, setIsTypeChecked] = useState(
-    flatted.parse(flatted.stringify([]))
-  );
-  const [isStatusChecked, setIsStatusChecked] = useState(
-    flatted.parse(flatted.stringify([]))
-  );
-
+ 
   const modalToggle = (e, transaction) => {
     setModalShow(!modalShow);
     setStateTransactions(transaction);
   };
-  const [currentPage, setCurrentPage] = useState(1);
-  const gettransaction = async () => {
-    let filter = { types: isTypeChecked, status: isStatusChecked };
-    if (currentPage) {
-      await jwtAxios
-        .post(
-          `/transactions/getTransactions?query=${
-            searchTrnx ? searchTrnx : null
-          }&statusFilter=${
-            statusFilter ? statusFilter : null
-          }&page=${currentPage}&pageSize=${PageSize}`,
-          filter
-        )
-        .then((res) => {
-          setTransactionLoading(false);
-          setTransactions(res.data?.transactions);
-          setTotalTransactionsCount(res.data?.totalTransactionsCount);
-        })
-        .catch((err) => {
-          setTransactionLoading(false);
-        });
-    }
-  };
-
+ 
   useEffect(() => {
     if (isComponentMounted) {
       const delayApiCall = setTimeout(() => {
@@ -80,14 +47,14 @@ function Transaction() {
   useEffect(() => {
     if (isComponentMounted) {
       setCurrentPage(1);
-      gettransaction();
+      gettransaction(isTypeChecked, isStatusChecked);
     }
   }, [debouncedSearchValue, statusFilter, isTypeChecked, isStatusChecked, isComponentMounted]);
 
   useEffect(() => {
-    gettransaction();
+    gettransaction(isTypeChecked, isStatusChecked);
     setIsComponentMounted(true);
-  }, [currentPage]);
+  }, [currentPage, isTypeChecked, isStatusChecked]);
 
   const setSearchQuery = (e) => {
     setSearchTrnx(e.target.value);
@@ -282,11 +249,10 @@ function Transaction() {
                     transaction?.price_amount
                   )}
                 </p>
-                <p>{transaction?.receive_currency}</p>
               </div>
               <div className="transaction-token">
                 <p className="text-white mb-1">
-                  {transaction?.is_sale ? transaction?.token_cryptoAmount <= 200
+                  {transaction?.is_sale && transaction?.is_process ? transaction?.token_cryptoAmount <= 200
                     ? formattedNumber(transaction?.token_cryptoAmount)
                     : "+200" : "0.00" }
                 </p>
@@ -326,7 +292,7 @@ function Transaction() {
                   )}
                   {transaction?.status == "pending" && (
                     <Button variant="outline-pending">
-                      UnConfirmed 
+                      Unconfirmed 
                     </Button>
                   )}
 

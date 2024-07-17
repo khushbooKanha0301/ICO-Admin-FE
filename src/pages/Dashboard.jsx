@@ -235,7 +235,7 @@ function Dashboard() {
                            {(transaction?.status == "pending") && (
                             <ExclamationIcon width="16" height="16" />
                           )}
-                         {transaction?.is_sale ? transaction?.token_cryptoAmount <= 200
+                         {transaction?.is_sale && transaction?.is_process ? transaction?.token_cryptoAmount <= 200
                             ? formattedNumber(transaction?.token_cryptoAmount)
                             : "+200" : "0.00" }
                         </div>

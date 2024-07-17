@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
 import jwtAxios, { setAuthToken } from "../../service/jwtAxios";
 import { setLoading } from "./commonSlice";
 import { notificationFail, notificationSuccess } from "./notificationSlice";
 
 const authToken = window.localStorage.getItem("authToken") || null;
 const roleId = window.localStorage.getItem("roleId") || null;
-
 const userId = window.localStorage.getItem("userId") || null;
+
 const initialState = {
   authToken: authToken,
   userId: userId,
@@ -19,17 +18,14 @@ export const login = createAsyncThunk("login", async (action, { dispatch }) => {
   dispatch(setLoading(true));
   try {
     let res = await jwtAxios.post(`/auth/adminlogin`, action).catch((error) => {
-      if(typeof error == "string")
-      {
+      if(typeof error == "string"){
         dispatch(notificationFail(error));
-      }else{
+      } else{
         dispatch(notificationFail(error?.response?.data?.message));
       }
-      
       dispatch(setLoading(false));
     });
     if (res?.data) {
-      dispatch(notificationSuccess(res.data?.message));
       setAuthToken(res.data?.token);
       return {
         authToken: res.data?.token,
@@ -67,6 +63,22 @@ export const logout = createAsyncThunk(
   }
 );
 
+export const getAllPermissions = createAsyncThunk(
+  "getAllPermissions",
+  async (action, { dispatch }) => {
+    try {
+      const res = await jwtAxios
+        .get(`auth/getAllPermissions`)
+        .then((response) => {
+          return response?.data?.fetchAllpermissions;
+        });
+      return res;
+    } catch (error) {
+      dispatch(notificationFail(error?.response?.data?.message));
+    }
+  }
+);
+
 const authenticationSlice = createSlice({
   name: "auth",
   initialState,
@@ -82,7 +94,7 @@ const authenticationSlice = createSlice({
         if (!action?.payload) {
           return;
         }
-        state.authToken = action.payload?.authToken;
+        state.authToken = action.payload?.authToken;  
         state.userId = action.payload?.userId;
         state.roleId = action.payload?.roleId;
         window.localStorage.setItem("authToken", action.payload?.authToken);
@@ -98,6 +110,13 @@ const authenticationSlice = createSlice({
 
         state.authToken = null;
         state.roleId = null;
+        state.ipAddress = null;
+      })
+      .addCase(getAllPermissions.fulfilled, (state, action) => {
+        if (!action?.payload) {
+          return;
+        }
+        state.fetchAllpermissions = action.payload;
       });
   },
 });

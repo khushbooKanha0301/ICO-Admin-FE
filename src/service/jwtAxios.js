@@ -1,74 +1,86 @@
-import axios from 'axios'
-import apiConfig from "../service/config"
+import axios from "axios";
+import apiConfig from "../service/config";
 const API_URL = `${apiConfig.BASE_URL}`;
-const token = localStorage.getItem('token')
+const token = localStorage.getItem("token");
+
+const response = await fetch("https://api.ipify.org?format=json");
+const data = await response.json();
+const ipAddress = data.ip;
+
 const jwtAxios = axios.create({
   baseURL: API_URL, // YOUR_API_URL HERE
   headers: {
-    'Content-Type': 'application/json',
-    'mode': "no-cors",
-    'Access-Control-Allow-Origin': "*",
-    ...(token && { "Authorization": `Bearer ${token}` })
-  }
-})
+    "Content-Type": "application/json",
+    mode: "no-cors",
+    "Access-Control-Allow-Origin": "*",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
 
 jwtAxios.interceptors.request.use(
-  config => {
-    let throttleTime = localStorage.getItem('throttleTime');
+  (config) => {
+    let throttleTime = localStorage.getItem("throttleTime");
     if (throttleTime) {
       throttleTime = JSON.parse(throttleTime);
-      if(throttleTime[config.url])
-      {
+      if (throttleTime[config.url]) {
         let storedTime = throttleTime[config.url];
         const currentTime = new Date().getTime();
         const futureTime = parseInt(storedTime);
 
         if (currentTime <= futureTime) {
-          return Promise.reject('Too Many Requests. Please Try after sometimes');
+          return Promise.reject(
+            "Too Many Requests. Please Try after sometimes"
+          );
         }
       }
     }
-    config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
-    config.headers['RoleId'] = `${localStorage.getItem('roleId')}`;
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
+    config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+    config.headers["RoleId"] = `${localStorage.getItem("roleId")}`;
+    config.headers["userId"] = `${localStorage.getItem("userId")}`;
+    config.headers["ipAddress"] = ipAddress;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 jwtAxios.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response && err.response.data.message === 'Authorization Token not valid.') {
+    if (
+      err.response &&
+      err.response.data.message === "Authorization Token not valid."
+    ) {
       window.localStorage.clear();
-      window.location.href="/";
+      window.location.href = "/";
     }
-    if(err?.response?.data?.message === "Too Many Requests. Please Try after sometimes")
-    {
-      const currentTime = new Date().getTime(); 
-      const futureTime = currentTime + 60000; 
+    if (
+      err?.response?.data?.message ===
+      "Too Many Requests. Please Try after sometimes"
+    ) {
+      const currentTime = new Date().getTime();
+      const futureTime = currentTime + 60000;
       let apiThrottle = {};
-      let throttleTime = localStorage.getItem('throttleTime'); 
-      if(throttleTime)
-      {
+      let throttleTime = localStorage.getItem("throttleTime");
+      if (throttleTime) {
         throttleTime = JSON.parse(throttleTime);
         apiThrottle = throttleTime;
       }
-      apiThrottle[err.config.url]=[futureTime];
-      localStorage.setItem('throttleTime', JSON.stringify(apiThrottle));
+      apiThrottle[err.config.url] = [futureTime];
+      localStorage.setItem("throttleTime", JSON.stringify(apiThrottle));
     }
-    return Promise.reject(err)
+    return Promise.reject(err);
   }
-)
+);
 export const setAuthToken = (token) => {
   if (token) {
-    jwtAxios.defaults.headers.common.Authorization = `Bearer ${token}`
-    localStorage.setItem('token', token)
+    jwtAxios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    localStorage.setItem("token", token);
   } else {
-    delete jwtAxios.defaults.headers.common.Authorization
-    localStorage.removeItem('token')
+    delete jwtAxios.defaults.headers.common.Authorization;
+    localStorage.removeItem("token");
   }
-}
+};
 
-export default jwtAxios
+export default jwtAxios;

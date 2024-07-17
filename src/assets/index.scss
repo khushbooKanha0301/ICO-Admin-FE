@@ -1136,6 +1136,14 @@ body {
                     padding: 10px;
                 }
             }
+
+            .admin-view {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 20px;
+
+              
+            }
         }
 
         &.ico-coin {
@@ -1496,6 +1504,134 @@ body {
     }
 }
 
+.admin-view {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    @include media-breakpoint-up(lg) {
+        margin-top: 32px;
+    }
+
+    h2 {
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 24px;
+        color: $white;
+        margin-bottom: 0;
+    }
+    .create-admin-btn {
+        width: 166px;
+        padding: 16px 20px;
+
+        @media (max-height: 700px) {
+            padding: 10px 20px;
+        }
+    }
+
+    .dropdown-toggle {
+        background: $cards-bg;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        width: 36px;
+        height: 36px;
+        border: none;
+
+        svg {
+            stroke: $white;
+        }
+
+        &::before {
+            display: none;
+        }
+    }
+
+    .dropdown-menu {
+        background: #18191D;
+        box-shadow: -6px 8px 60px rgba(0, 0, 0, 0.25);
+        border-radius: 6px;
+        border: none;
+        margin-right: 15px;
+        margin-top: 5px;
+        padding: 10px;
+        color: $white;
+
+        &::before {
+            content: '';
+            position: absolute;
+            border-top: 11px solid transparent;
+            border-left: 22px solid $cards-bg;
+            border-bottom: 11px solid transparent;
+            border-radius: 2px;
+            top: 0;
+            right: -11px;
+        }
+
+        .dropdown-title {
+            font-size: 13px;
+            line-height: 16px;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .dropdown-divider {
+            border-top-color: #252729;
+            margin: 10px 0;
+        }
+
+        .form-check {
+            margin-bottom: 10px;
+
+            input {
+                width: 18px;
+                height: 18px;
+                border-radius: 4px;
+                background-color: #C4C4C4;
+                border: none;
+                box-shadow: none;
+
+                &:checked {
+                    background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
+                }
+            }
+
+            .form-check-input {
+                width: 18px;
+                height: 18px;
+                border-radius: 4px;
+                background-color: #C4C4C4;
+                border: none;
+                box-shadow: none;
+
+                &.checked {
+                    background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
+                }
+            }
+
+            label {
+                font-size: 13px;
+                line-height: 16px;
+                letter-spacing: -0.03em;
+            }
+        }
+    }
+    .flex-table {
+        .flex-table-top {
+            .input-group {
+                max-width: 270px;
+                margin-left: 50%;
+            }
+        }
+    }
+
+    .tranx-icon {
+        flex: 0 0 32px;
+        margin-right: 7px;
+    }
+}
+
 .table-responsive {
     @include media-breakpoint-down(xl) {
         overflow-y: hidden;
@@ -1522,6 +1658,59 @@ body {
             flex: 1 0;
             padding: 18px 16px;
             word-break: break-all;
+
+            &.admins-fname {
+                flex: 0 0 20%;
+            }
+
+            &.admins-lname {
+                flex: 0 0 20%;
+            }
+
+            &.admins-username {
+                flex: 0 0 22%;
+            }
+            &.admins-status {
+                flex: 0 0 25%;
+                
+            }
+
+            &.admins-status {
+                .dropstart{
+                    width: 100%;
+                    display: flex;
+                    justify-content: end;
+                }
+                
+                .dropdown-toggle {
+                    background: rgba(255, 255, 255, 0.21);
+
+                    &.show {
+                        background: rgba(79, 79, 79, 0.21);
+                    }
+                }
+
+                .dropdown-menu {
+                    svg {
+                        stroke: $white;
+                        margin-right: 8px;
+                    }
+
+                    .btn-link {
+                        font-weight: 700;
+                        font-size: 13px;
+                        line-height: 20px;
+                        color: $white;
+                        text-decoration: none;
+                        height: 20px;
+                        padding: 0;
+
+                        &:not(:last-child) {
+                            margin-bottom: 10px;
+                        }
+                    }
+                }
+            }
 
             &.transaction-tranx-no {
                 flex: 0 0 22%;
@@ -1783,6 +1972,11 @@ body {
         }
     }
 }
+
+.accessMsg {
+    color: white;
+}
+
 
 .table-pagination {
     margin-top: 40px;
@@ -3107,4 +3301,41 @@ img.circle-data {
 
 ::-webkit-scrollbar {
     width: 0px;
+}
+
+
+.form-check {
+    margin-bottom: 10px;
+
+    input {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background-color: #C4C4C4;
+        border: none;
+        box-shadow: none;
+
+        &:checked {
+            background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
+        }
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background-color: #C4C4C4;
+        border: none;
+        box-shadow: none;
+
+        &.checked {
+            background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
+        }
+    }
+
+    label {
+        font-size: 13px;
+        line-height: 16px;
+        letter-spacing: -0.03em;
+    }
 }

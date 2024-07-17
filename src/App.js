@@ -13,19 +13,39 @@ import UserListComponent from "./pages/Userlist";
 import SnackBar from "./snackBar";
 import AuthRoute from "./AuthRoute";
 import TransactionComponent from "./pages/Transaction";
+import SubAdminlistComponent from "./pages/SubAdminlist";
 import ResetPasswordComponent from "./components/ResetPasswordComponent";
 import { useJwt } from "react-jwt";
 import { setSAL } from "./store/slices/AuthenticationSlice";
-import { checkCurrentSale} from "./store/slices/currencySlice";
+import { checkCurrentSale } from "./store/slices/currencySlice";
+import { database, firebaseMessages } from "./config";
+import { ref, get, update } from "@firebase/database";
+import { notificationFail , notificationSuccess} from "./store/slices/notificationSlice";
+import moment from "moment";
+import jwtAxios from "./service/jwtAxios";
+import * as flatted from "flatted";
 
+let PageSize = 5;
 export const App = () => {
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(true);
   const sidebarToggle = () => setIsOpen(!isOpen);
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isResponsive, setIsResponsive] = useState(false);
-  
-  const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transactions, setTransactions] = useState(null);
+  const [totalTransactionsCount, setTotalTransactionsCount] = useState(0);
+  const [transactionLoading, setTransactionLoading] = useState(true);
+
+  const [isTypeChecked, setIsTypeChecked] = useState(
+    flatted.parse(flatted.stringify([]))
+  );
+  const [isStatusChecked, setIsStatusChecked] = useState(
+    flatted.parse(flatted.stringify([]))
+  );
+  const [searchTrnx, setSearchTrnx] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const authToken =
     useSelector((state) => state.authenticationReducer?.authToken) || null;
@@ -35,7 +55,7 @@ export const App = () => {
 
   const token = localStorage.getItem("token") || "";
   const { decodedToken } = useJwt(token);
-  
+
   useEffect(() => {
     if (decodedToken && roleId) {
       dispatch(setSAL(decodedToken.access));
@@ -56,6 +76,106 @@ export const App = () => {
     };
   }, []);
 
+  const gettransaction = async (isTypeChecked , isStatusChecked) => {
+    let filter = { types: isTypeChecked, status: isStatusChecked };
+    if (currentPage) {
+      await jwtAxios
+      .post(
+        `/transactions/getTransactions?query=${
+          searchTrnx ? searchTrnx : null
+        }&statusFilter=${
+          statusFilter ? statusFilter : null
+        }&page=${currentPage}&pageSize=${PageSize}`,
+        filter
+      )
+      .then((res) => {
+        setTransactionLoading(false);
+        setTransactions(res.data?.transactions);
+        setTotalTransactionsCount(res.data?.totalTransactionsCount);
+      })
+      .catch((err) => {
+        setTransactionLoading(false);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if(authToken) {
+      gettransaction(isTypeChecked , isStatusChecked);
+    }
+  }, [currentPage, authToken, isTypeChecked , isStatusChecked]);
+
+  useEffect(() => {
+    const userRef = ref(
+      database,
+      firebaseMessages?.ICO_TRANSACTIONS
+    );
+
+    const updateLastActive = () => {
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const transactions = snapshot.val();
+          for (const [key, value] of Object.entries(transactions)) {
+            const dateMoment = moment.utc(value?.lastActive);
+            const currentMoment = moment.utc();
+            const differenceInMinutes = currentMoment.diff(dateMoment, 'minutes');
+            if(authToken){
+                if (!value.is_pending  && !value.is_open) {
+                  if(differenceInMinutes < 1){
+                  dispatch(notificationFail(`Outside Transactions Pending`));
+                    const userUpdateRef = ref(
+                      database,
+                      firebaseMessages?.ICO_TRANSACTIONS  + "/" + key
+                    );
+                    update(userUpdateRef, {
+                      lastActive: Date.now(),
+                      is_pending: true
+                    });
+                  }
+                }
+                if (!value.is_open && value.is_pending) {
+                  if(differenceInMinutes < 1){
+                  dispatch(notificationSuccess(`Outside Transaction Successfull`));
+                  const userUpdateRef = ref(
+                    database,
+                    firebaseMessages?.ICO_TRANSACTIONS  + "/" + key
+                  );
+                  update(userUpdateRef, {
+                    lastActive: Date.now(),
+                    is_open: true
+                  });
+                 }
+                }
+            }
+          }
+        } 
+      }).catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+    };
+
+      const interval = setInterval(function () {
+        updateLastActive()
+      }, 1000); // 5 seconds in milliseconds
+     
+      window.addEventListener("beforeunload", updateLastActive());
+      window.addEventListener("mousemove", updateLastActive());
+      window.addEventListener("keydown", updateLastActive());
+      window.addEventListener("scroll", updateLastActive());
+      window.addEventListener("click", updateLastActive());
+
+      // Clean up the listeners when the component unmounts or user logs out
+      return () => {
+        window.removeEventListener("beforeunload", updateLastActive());
+        window.removeEventListener("mousemove", updateLastActive());
+        window.removeEventListener("keydown", updateLastActive());
+        window.removeEventListener("scroll", updateLastActive());
+        window.removeEventListener("click", updateLastActive());
+        clearInterval(interval);
+      }
+
+  }, [authToken]);
+
   return (
     <>
       <Container
@@ -68,6 +188,7 @@ export const App = () => {
         <SnackBar />
         {authToken && (
           <Sidebar
+            roleId={roleId}
             clickHandler={sidebarToggle}
             setIsOpen={setIsOpen}
             isResponsive={isResponsive}
@@ -84,6 +205,16 @@ export const App = () => {
             <Routes>
               {authToken ? (
                 <>
+                  {roleId === 1 && (
+                    <Route
+                      path="/admins"
+                      element={
+                        <AuthRoute>
+                          <SubAdminlistComponent />
+                        </AuthRoute>
+                      }
+                    />
+                  )}
                   <Route
                     path="/"
                     element={
@@ -104,7 +235,15 @@ export const App = () => {
                     path="/transactions"
                     element={
                       <AuthRoute>
-                        <TransactionComponent />
+                        <TransactionComponent setCurrentPage={setCurrentPage} 
+                        transactionLoading={transactionLoading} transactions={transactions} 
+                        totalTransactionsCount={totalTransactionsCount} gettransaction={gettransaction}
+                        isTypeChecked={isTypeChecked} setIsTypeChecked={setIsTypeChecked}
+                        isStatusChecked={isStatusChecked} setIsStatusChecked={setIsStatusChecked}
+                        setSearchTrnx={setSearchTrnx} setStatusFilter={setStatusFilter}
+                        searchTrnx={searchTrnx} statusFilter={statusFilter}
+                        PageSize={PageSize} currentPage={currentPage}
+                        />
                       </AuthRoute>
                     }
                   />

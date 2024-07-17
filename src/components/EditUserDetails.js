@@ -423,51 +423,6 @@ export const EditUserDetails = (props) => {
                     </>
                   )}
                 </div>
-                {/* <div className="d-flex align-items-center">
-                  <Form.Control
-                    placeholder={"Newyork"}
-                    name="city"
-                    value={city}
-                    onChange={(e) => {
-                      onChange(e);
-                    }}
-                  />
-
-                  {location ? (
-                    <img
-                      src={countryName()}
-                      alt="Flag"
-                      className="circle-data"
-                    />
-                  ) : (
-                    "No Flag"
-                  )}
-
-                  <div className="country-select" ref={optionsDropdownRef}>
-                    
-                    <div
-                      className="dropdownPersonalData form-select form-select-sm"
-                      onClick={toggleCountryOptions}
-                    >
-                     <p className="text-white mb-0">{listData.find((item) => item?.iso === location)?.cca3}</p>
-                    </div>
-                    {showCountryOptions && (
-                      <ul className="options locationDropdown">
-                        {listData.map((data, key) => (
-                          <li
-                            key={key}
-                            onClick={() => {
-                              handleSelectedCountryClick(data?.iso);
-                              dispatch(defineCountry(data?.iso));
-                            }}
-                          >
-                           {data.country}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div> */}
               </Form.Group>
             </Col>
           </Row>
