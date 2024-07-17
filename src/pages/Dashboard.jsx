@@ -17,14 +17,15 @@ import { formattedNumber, getDateFormate } from "../utils";
 import jwtAxios from "../service/jwtAxios";
 import { getUsersCount } from "../store/slices/UserSlice";
 
-function Dashboard() {
-  const [transactions, setTransactions] = useState(null);
+function Dashboard(props) {
+  const {transactionLoading , transactions } = props;
+  //const [transactions, setTransactions] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [sinceLastWeekSale, setSinceLastWeekSale] = useState(0);
   const [userType, setUserType] = useState("user");
-  const [transactionLoading, setTransactionLoading] = useState(false);
+  //const [transactionLoading, setTransactionLoading] = useState(false);
   const { sales } = useSelector((state) => state?.currenyReducer);
 
   const totalUser = useSelector((state) => state.userReducer?.totalUser);
@@ -48,25 +49,6 @@ function Dashboard() {
       dispatch(resetTokenData());
     }
   }, [dispatch, authToken]);
-
-  useEffect(() => {
-    setTransactionLoading(true);
-    setTransactions([]);
-    const gettransaction = async () => {
-      if (authToken && currentPage) {
-        await jwtAxios
-          .post(`/transactions/getTransactions?page=1&pageSize=3`)
-          .then((res) => {
-            setTransactionLoading(false);
-            setTransactions(res.data?.transactions);
-          })
-          .catch((err) => {
-            setTransactionLoading(false);
-          });
-      }
-    };
-    gettransaction();
-  }, [authToken, currentPage]);
 
   useEffect(() => {
     const getDashboardTransactionData = async () => {

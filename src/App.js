@@ -120,32 +120,34 @@ export const App = () => {
             const currentMoment = moment.utc();
             const differenceInMinutes = currentMoment.diff(dateMoment, 'minutes');
             if(authToken){
-                if (!value.is_pending  && !value.is_open) {
-                  if(differenceInMinutes < 1){
-                  dispatch(notificationFail(`Outside Transactions Pending`));
-                    const userUpdateRef = ref(
-                      database,
-                      firebaseMessages?.ICO_TRANSACTIONS  + "/" + key
-                    );
-                    update(userUpdateRef, {
-                      lastActive: Date.now(),
-                      is_pending: true
-                    });
-                  }
-                }
-                if (!value.is_open && value.is_pending) {
-                  if(differenceInMinutes < 1){
-                  dispatch(notificationSuccess(`Outside Transaction Successfull`));
+              if (!value.is_pending  && !value.is_open) {
+                if(differenceInMinutes < 1){
+                dispatch(notificationFail(`Outside Transaction Pending`));
+                gettransaction(isTypeChecked , isStatusChecked);
                   const userUpdateRef = ref(
                     database,
                     firebaseMessages?.ICO_TRANSACTIONS  + "/" + key
                   );
                   update(userUpdateRef, {
                     lastActive: Date.now(),
-                    is_open: true
+                    is_pending: true
                   });
-                 }
                 }
+              }
+              if (!value.is_open && value.is_pending && value.status == "paid") {
+                if(differenceInMinutes < 1){
+                dispatch(notificationSuccess(`Outside Transaction Successfull`));
+                gettransaction(isTypeChecked , isStatusChecked);
+                const userUpdateRef = ref(
+                  database,
+                  firebaseMessages?.ICO_TRANSACTIONS  + "/" + key
+                );
+                update(userUpdateRef, {
+                  lastActive: Date.now(),
+                  is_open: true
+                });
+                }
+              }
             }
           }
         } 
@@ -154,25 +156,25 @@ export const App = () => {
       });
     };
 
-      const interval = setInterval(function () {
-        updateLastActive()
-      }, 1000); // 5 seconds in milliseconds
-     
-      window.addEventListener("beforeunload", updateLastActive());
-      window.addEventListener("mousemove", updateLastActive());
-      window.addEventListener("keydown", updateLastActive());
-      window.addEventListener("scroll", updateLastActive());
-      window.addEventListener("click", updateLastActive());
+    const interval = setInterval(function () {
+      updateLastActive()
+    }, 1000); // 5 seconds in milliseconds
+    
+    window.addEventListener("beforeunload", updateLastActive());
+    window.addEventListener("mousemove", updateLastActive());
+    window.addEventListener("keydown", updateLastActive());
+    window.addEventListener("scroll", updateLastActive());
+    window.addEventListener("click", updateLastActive());
 
-      // Clean up the listeners when the component unmounts or user logs out
-      return () => {
-        window.removeEventListener("beforeunload", updateLastActive());
-        window.removeEventListener("mousemove", updateLastActive());
-        window.removeEventListener("keydown", updateLastActive());
-        window.removeEventListener("scroll", updateLastActive());
-        window.removeEventListener("click", updateLastActive());
-        clearInterval(interval);
-      }
+    // Clean up the listeners when the component unmounts or user logs out
+    return () => {
+      window.removeEventListener("beforeunload", updateLastActive());
+      window.removeEventListener("mousemove", updateLastActive());
+      window.removeEventListener("keydown", updateLastActive());
+      window.removeEventListener("scroll", updateLastActive());
+      window.removeEventListener("click", updateLastActive());
+      clearInterval(interval);
+    }
 
   }, [authToken]);
 
@@ -219,7 +221,7 @@ export const App = () => {
                     path="/"
                     element={
                       <AuthRoute>
-                        <DashboardComponent />{" "}
+                        <DashboardComponent transactionLoading={transactionLoading} transactions={transactions} />{" "}
                       </AuthRoute>
                     }
                   />
