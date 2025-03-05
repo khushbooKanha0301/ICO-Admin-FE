@@ -9,6 +9,7 @@ import jwtAxios from "../service/jwtAxios";
 import ForgotPasswordOTP from "../components/ForgotPasswordOTP";
 import { useNavigate } from "react-router-dom";
 
+//this component is used for forget password
 const ForgotPasswordComponent = () => {
   const [email, setEmail] = useState("admin@middn.com");
   const [isModalOpen, setIsModalOpen] = useState(false);

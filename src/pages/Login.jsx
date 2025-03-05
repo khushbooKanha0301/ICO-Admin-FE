@@ -5,9 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { notificationFail } from "../store/slices/notificationSlice";
 import { login } from "../store/slices/AuthenticationSlice";
 
-const Login = () => {
-  const [password, setPassword] = useState("Password");
-  const [email, setEmail] = useState("admin@middn.com");
+const Login = (props) => {
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loginUser = () => {
@@ -22,7 +22,7 @@ const Login = () => {
   };
 
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       loginUser();
     }
   };
@@ -66,12 +66,16 @@ const Login = () => {
           </Row>
           <Row className="justify-content-between align-items-center">
             <Col xs="auto">
-            <Button className="login-btn" variant="primary" onClick={() => loginUser()}>
-              Login
-            </Button>
+              <Button
+                className="login-btn"
+                variant="primary"
+                onClick={() => loginUser()}
+              >
+                Login
+              </Button>
             </Col>
             <Col xs="auto" className="forgot-link">
-              <Link to='/forgot-password'>Forgot password?</Link>
+              <Link to="/forgot-password">Forgot password?</Link>
             </Col>
           </Row>
         </Form>

@@ -4,7 +4,7 @@ import { formattedNumber, getDateFormate } from "../utils";
 
 export const TransactionDetails = (props) => {
   let orderContent = "";
-  if (props?.stateTransactions?.tran_id != undefined) {
+  if (props?.stateTransactions?.transactionHash != undefined) {
     orderContent =
       props?.stateTransactions?.status === "paid" ? (
         <>
@@ -13,13 +13,13 @@ export const TransactionDetails = (props) => {
             Payment).
           </p>
           <p>
-            The order no. {props?.stateTransactions?.tran_id} was placed on
+            The order no. {props?.stateTransactions?.transactionHash} was placed on
             {" " + getDateFormate(props?.stateTransactions?.created_at,"MMM DD, YYYY HH:mm:ss")}.
           </p>
         </>
       ) : (
         <p>
-          The order no. {props?.stateTransactions?.tran_id} was placed on
+          The order no. {props?.stateTransactions?.transactionHash} was placed on
           {" " + getDateFormate(props?.stateTransactions?.created_at,"MMM DD, YYYY HH:mm:ss")}.
         </p>
       );
@@ -40,17 +40,14 @@ export const TransactionDetails = (props) => {
       <Modal.Header closeButton className="transaction-header">
         <Modal.Title>
           Transaction Details
-          {(props?.stateTransactions?.status === "canceled" ||
-            props?.stateTransactions?.status === "expired" ||
-            props?.stateTransactions?.status === "invalid") && (
+          {(props?.stateTransactions?.status === "failed") && (
             <Button variant="outline-danger">
               {" "}
               {props?.stateTransactions?.status.charAt(0).toUpperCase() +
                 props?.stateTransactions?.status.slice(1)}
             </Button>
           )}
-          {(props?.stateTransactions?.status === "new" ||
-            props?.stateTransactions?.status === "pending" ) && (
+          {(props?.stateTransactions?.status === "pending" ) && (
             <Button variant="outline-info">
               {props?.stateTransactions?.status.charAt(0).toUpperCase() +
                 props?.stateTransactions?.status.slice(1)}
@@ -93,6 +90,10 @@ export const TransactionDetails = (props) => {
               <tr>
                 <th>Bonus Token (B)</th>
                 <td>0 Bonus</td>
+              </tr>
+              <tr>
+                <th>Network</th>
+                <td>{props?.stateTransactions?.network}</td>
               </tr>
               <tr>
                 <th>Total Token</th>

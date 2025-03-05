@@ -8,6 +8,7 @@ import {
   notificationSuccess,
 } from "../store/slices/notificationSlice";
 
+//This component is used for reset password 
 const ResetPasswordComponent = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

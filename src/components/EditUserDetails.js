@@ -1,34 +1,83 @@
 import listData from "./countryData";
 import React, { forwardRef, useEffect, useState } from "react";
 import { Button, Col, Form, Row, Modal } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   notificationFail,
   notificationSuccess,
 } from "../../src/store/slices/notificationSlice";
 import jwtAxios from "../../src/service/jwtAxios";
-import {
-  defineCountry,
-  definePhoneCode,
-} from "../../src/store/slices/countrySettingSlice";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import { CalenderIcon } from "./SVGIcon";
+import SelectOptionDropdown from "./SelectOptionDropdown";
+import SelectLocationDropdown from "./SelectLocationDropdown";
+
+//This component is used for edit user details
 export const EditUserDetails = (props) => {
   const dispatch = useDispatch();
-  const [fname, setFname] = useState(null);
-  const [lname, setLname] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [phone, setPhone] = useState(null);
-  const [city, setCity] = useState(null);
-  const [res_address, setResAddress] = useState(null);
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
   const [dob, setDob] = useState("");
-  const [location, setLocation] = useState(null);
-  const [countryCallingCode, setCountryCallingCode] = useState(null);
+
+  const [res_address, setResAddress] = useState("");
+  const [location, setLocation] = useState("US");
+  const [nationality, setNationality] = useState("United States");
+  const [countryCallingCode, setCountryCallingCode] = useState("");
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [imageUrlSet, setImageUrl] = useState("https://flagcdn.com/h40/us.png");
+  const [imageSearchUrlSet, setImageSearchUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [selectedOption, setSelectedOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
+
+  const [searchText, setSearchText] = useState(
+    `${selectedOption?.country} (${selectedOption?.code})`
+  );
+
+  const [selectedLocationOption, setSelectedLocationOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
+
+  const [imageUrlLocationSet, setImageLocationUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [imageLocationSearchUrlSet, setImageLocationSearchUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [searchLocationText, setSearchLocationText] = useState(
+    `${selectedLocationOption?.country}`
+  );
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mobileMatch.matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     let user = props?.viewKYC?.user;
+    console.log("user ", user);
     if (user) {
       setFname(user?.fname ? user?.fname : "");
       setLname(user?.lname ? user?.lname : "");
@@ -37,17 +86,31 @@ export const EditUserDetails = (props) => {
       setCity(user?.city ? user?.city : "");
       setResAddress(user?.res_address ? user?.res_address : "");
       setDob(user?.dob ? moment(user?.dob, "DD/MM/YYYY").toDate() : "");
-      setLocation(user?.location ? user?.location : "");
+      setLocation(user?.location ? user?.location : "US");
     }
 
     if (user?.location) {
       setLocation(user?.location);
-    } else {
-      setLocation("US");
+      const result = listData.find((item) => item?.iso === user?.location);
+      setSelectedLocationOption(result);
+      setImageLocationUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
+      setImageLocationSearchUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
+      setSearchLocationText(result?.country);
     }
 
     if (user?.phoneCountry) {
       setCountryCallingCode(user?.phoneCountry);
+      const result = listData.find((item) => item?.code.trim() === user?.phoneCountry.trim());
+      setSelectedOption(result);
+      setImageUrl(`https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`);
+      setSearchText(`${result?.country} (${result?.code})`);
+      setImageSearchUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
     } else {
       setCountryCallingCode(" +1");
     }
@@ -75,57 +138,52 @@ export const EditUserDetails = (props) => {
   };
 
   const submitHandler = async () => {
-      let formSubmit = {
-        fname: fname,
-        lname: lname,
-        email: email,
-        phone: phone,
-        dob: dob ? dob.toLocaleDateString("en-GB") : null,
-        location: location,
-        city: city,
-        res_address: res_address,
-        phoneCountry: countryCallingCode,
-      };
-      let updateUser = await jwtAxios
-        .put(
-          `/users/updateAccountSettings/${props?.viewKYC?.user?.wallet_address}`,
-          formSubmit
-        )
-        .catch((error) => {
-          if(typeof error == "string")
-          {
-            dispatch(notificationFail(error));
-          }
-          if (error?.response?.data?.message === "") {
-            dispatch(notificationFail("Invalid "));
-          }
-          if(error?.response?.data?.message)
-          {
-            dispatch(notificationFail(error?.response?.data?.message));
-          }
-        });
-      if (updateUser) {
-        props.onHide();
-        props.getusers();
-        dispatch(notificationSuccess("User details updated successfully !"));
-      }
-  };
-
-  const phoneCountry = () => {
-    const result = listData.find((item) => item?.code === countryCallingCode);
-    return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
+    let formSubmit = {
+      fname: fname,
+      lname: lname,
+      email: email,
+      phone: phone,
+      dob: dob ? dob.toLocaleDateString("en-GB") : null,
+      location: location,
+      city: city,
+      res_address: res_address,
+      phoneCountry: countryCallingCode,
+    };
+    let updateUser = await jwtAxios
+      .put(
+        `/users/updateAccountSettings/${props?.viewKYC?.user?.wallet_address}`,
+        formSubmit
+      )
+      .catch((error) => {
+        if (typeof error == "string") {
+          dispatch(notificationFail(error));
+        }
+        if (error?.response?.data?.message === "") {
+          dispatch(notificationFail("Invalid "));
+        }
+        if (error?.response?.data?.message) {
+          dispatch(notificationFail(error?.response?.data?.message));
+        }
+      });
+    if (updateUser) {
+      props.onHide();
+      props.getusers();
+      dispatch(notificationSuccess("User details updated successfully !"));
+    }
   };
 
   const DatepickerCustomInput = forwardRef(({ value, onClick }, ref) => (
-    <div style={{display:"flex"}} onClick={onClick} >
-    <Form.Control className="example-custom-input" ref={ref} value={value} placeholder="DD MMMM YYYY" />
-    <CalenderIcon width={30} height={30} />
+    <div style={{ display: "flex" }} onClick={onClick}>
+      <Form.Control
+        className="example-custom-input"
+        ref={ref}
+        value={value}
+        placeholder="DD/MM/YYYY"
+      />
+      <CalenderIcon width={30} height={30} />
     </div>
   ));
 
-  const countryName = () => {
-    return `https://flagcdn.com/h40/${location?.toLowerCase()}.png`;
-  };
   return (
     <Modal
       {...props}
@@ -178,57 +236,55 @@ export const EditUserDetails = (props) => {
                   name="email"
                   value={email}
                   onChange={(e) => onChange(e)}
+                  disabled={props?.viewKYC?.user?.email_verified ? true : false}
                 />
               </Form.Group>
             </Col>
             <Col md="6">
               <Form.Group className="form-group">
                 <Form.Label>Phone number</Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Control
-                      placeholder={countryCallingCode}
-                      name="phone"
-                      type="text"
-                      value={phone}
-                      onChange={(e) => {
-                        onChange(e);
-                      }}
-                      maxlength="10"
-                    />
-
-                    {countryCallingCode ? (
+                <div
+                  className={`d-flex items-center custom-dropdown justify-between relative`}
+                >
+                  <Form.Control
+                    placeholder={countryCallingCode}
+                    name="phone"
+                    type="text"
+                    value={phone}
+                    onChange={(e) => {
+                      onChange(e);
+                    }}
+                    maxLength="10"
+                    className={isMobile ? "md:w-auto w-full" : ""}
+                  />
+                  <div
+                    className={`text-center flex items-center mobile-setting-dropdown ${
+                      isMobile ? "relative" : ""
+                    }`}
+                  >
+                    {selectedOption?.code ? (
                       <img
-                        src={phoneCountry()}
+                        src={imageUrlSet}
                         alt="Flag"
                         className="circle-data"
                       />
                     ) : (
                       "No Flag"
                     )}
-                    <p className="text-white mb-0">
-                      {
-                        listData.find(
-                          (item) => item?.code === countryCallingCode
-                        )?.cca3
-                      }
-                    </p>
-                    <div className="country-select">
-                      <Form.Select
-                        size="sm"
-                        onChange={(e) => {
-                          setCountryCallingCode(e.target.value);
-                          dispatch(definePhoneCode(e.target.value));
-                        }}
-                        value={countryCallingCode}
-                      >
-                        {listData.map((data, key) => (
-                          <option value={`${data?.code}`} key={key}>
-                            {data?.country} ({data?.code})
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </div>
+                    <SelectOptionDropdown
+                      imageUrlSet={imageUrlSet}
+                      setImageUrl={setImageUrl}
+                      selectedOption={selectedOption}
+                      setSelectedOption={setSelectedOption}
+                      setCountryCallingCode={setCountryCallingCode}
+                      countryCallingCode={countryCallingCode}
+                      setSearchText={setSearchText}
+                      searchText={searchText}
+                      setImageSearchUrl={setImageSearchUrl}
+                      imageSearchUrlSet={imageSearchUrlSet}
+                    />
                   </div>
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -246,51 +302,55 @@ export const EditUserDetails = (props) => {
                   name="dob"
                   customInput={<DatepickerCustomInput />}
                   maxDate={new Date()}
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
                 />
               </Form.Group>
             </Col>
             <Col md="6">
               <Form.Group className="form-group">
                 <Form.Label>Location</Form.Label>
-                  <div className="d-flex align-items-center">
-                    <Form.Control
-                      placeholder={"Newyork"}
-                      name="city"
-                      value={city}
-                      onChange={(e) => {
-                        onChange(e);
-                      }}
-                    />
-
+                <div className="d-flex items-center custom-dropdown justify-between relative">
+                  <Form.Control
+                    placeholder={"Newyork"}
+                    name="city"
+                    type="text"
+                    value={city}
+                    onChange={(e) => {
+                      onChange(e);
+                    }}
+                    className={isMobile ? "md:w-auto w-full" : ""}
+                  />
+                  <div
+                    className={`text-center flex items-center mobile-setting-dropdown ${
+                      isMobile ? "relative" : ""
+                    }`}
+                  >
                     {location ? (
                       <img
-                        src={countryName()}
+                        src={imageUrlLocationSet}
                         alt="Flag"
                         className="circle-data"
                       />
                     ) : (
                       "No Flag"
                     )}
-                    <p className="text-white mb-0">
-                      {listData.find((item) => item?.iso === location)?.cca3}
-                    </p>
-                    <div className="country-select">
-                      <Form.Select
-                        size="sm"
-                        onChange={(e) => {
-                          setLocation(e.target.value);
-                          dispatch(defineCountry(e.target.value));
-                        }}
-                        value={location}
-                      >
-                        {listData.map((data, key) => (
-                          <option value={`${data.iso}`} key={key}>
-                            {data.country}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </div>
+                    <SelectLocationDropdown
+                      selectedLocationOption={selectedLocationOption}
+                      setSelectedLocationOption={setSelectedLocationOption}
+                      setImageLocationUrl={setImageLocationUrl}
+                      imageUrlLocationSet={imageUrlLocationSet}
+                      setImageLocationSearchUrl={setImageLocationSearchUrl}
+                      imageLocationSearchUrlSet={imageLocationSearchUrlSet}
+                      setSearchLocationText={setSearchLocationText}
+                      searchLocationText={searchLocationText}
+                      setCountry={setLocation}
+                      country={location}
+                      setNationality={setNationality}
+                    />
                   </div>
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -308,7 +368,11 @@ export const EditUserDetails = (props) => {
               </Form.Group>
             </Col>
           </Row>
-          <Button variant="primary" onClick={submitHandler}>
+          <Button
+            variant="primary"
+            onClick={submitHandler}
+            className="edit-user-btn"
+          >
             Update
           </Button>
         </Form>
